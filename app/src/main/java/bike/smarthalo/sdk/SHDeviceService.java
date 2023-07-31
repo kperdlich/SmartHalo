@@ -612,6 +612,9 @@ public class SHDeviceService extends Service implements TransceiveContract, Devi
               String str = SHDeviceService.TAG;
               Log.i(str, "setCentralKey " + SHSdkHelpers.bytesToHex(bArr2));
               SHDeviceService.this.authenticateWithDevice(SHDeviceService.this.serviceStorageController.password);
+              //SHDeviceService.this.authenticateWithDevice("rofl");
+              //auth_setPassword("test", null);
+
             }
           });
         } catch (IOException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
@@ -1050,8 +1053,9 @@ public class SHDeviceService extends Service implements TransceiveContract, Devi
   }
 
   private void startScan() {
-    BluetoothAdapter bluetoothAdapter;
-    if (this.mIsScanning || (bluetoothAdapter = this.mBluetoothAdapter) == null || !bluetoothAdapter.isEnabled()) {
+    BluetoothAdapter bluetoothAdapter = this.mBluetoothAdapter;
+    if (this.mIsScanning || this.mBluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+      Log.i(TAG, "Bluetooth is disabled or not available");
       return;
     }
     Log.i(TAG, "Starting active ble scan");
@@ -1200,6 +1204,15 @@ public class SHDeviceService extends Service implements TransceiveContract, Devi
   /* JADX INFO: Access modifiers changed from: private */
   public void broadcastDeviceListUpdated() {
     sendBroadcast(new Intent(SHDeviceServiceIntents.BROADCAST_DEVICE_LIST_UPDATED));
+
+    // custom code
+    //BluetoothDevice bluetoothDevice = getBluetoothDevice(this.serviceStorageController.address);
+    BluetoothDevice bluetoothDevice = getBluetoothDevice(this.mDeviceList.get(0).address);
+    if (bluetoothDevice != null) {
+      stopPendingIntentScan();
+      startDirectConnectionTimeout();
+      this.bluetoothDataManager.setUpDeviceConnection(bluetoothDevice);
+    }
   }
 
   @Override // bike.smarthalo.sdk.encryption.EncryptionContract

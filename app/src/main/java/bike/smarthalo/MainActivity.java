@@ -1,5 +1,6 @@
 package bike.smarthalo;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -15,6 +16,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import bike.smarthalo.databinding.ActivityMainBinding;
+import bike.smarthalo.sdk.RequestPermissionsActivity;
+import bike.smarthalo.sdk.SHDeviceServiceStartHelper;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,9 +43,16 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                /*SHDeviceServiceStartHelper.requestLogout(Application.getAppContext());
+                boolean isTester = false;
+                SHDeviceServiceStartHelper.requestLogin(Application.getAppContext(), "password", "deviceId", isTester);*/
+
+                Intent myIntent = new Intent(Application.getAppContext(), RequestPermissionsActivity.class);
+                startActivity(myIntent);
+                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAnchorView(R.id.fab)
-                        .setAction("Action", null).show();
+                        .setAction("Action", null).show();*/
+
             }
         });
     }
