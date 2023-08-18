@@ -612,9 +612,6 @@ public class SHDeviceService extends Service implements TransceiveContract, Devi
               String str = SHDeviceService.TAG;
               Log.i(str, "setCentralKey " + SHSdkHelpers.bytesToHex(bArr2));
               SHDeviceService.this.authenticateWithDevice(SHDeviceService.this.serviceStorageController.password);
-              //SHDeviceService.this.authenticateWithDevice("rofl");
-              //auth_setPassword("test", null);
-
             }
           });
         } catch (IOException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
@@ -733,7 +730,7 @@ public class SHDeviceService extends Service implements TransceiveContract, Devi
   }
 
   private void onSuccessfulAuthentication() {
-    startForeground(FOREGROUND_NOTIF_ID, SHNotificationManager.getForegroundServiceNotification(this, this.serviceStorageController.name, false));
+    //startForeground(FOREGROUND_NOTIF_ID, SHNotificationManager.getForegroundServiceNotification(this, this.serviceStorageController.name, false));
     removeDeviceWithIdFromList(this.serviceStorageController.id);
     this.debugLogger.log(TAG, "Successful authentication, Clearing AUTHENTICATION timeout");
     clearAuthenticationTimeout();

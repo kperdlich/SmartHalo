@@ -1,31 +1,39 @@
 package bike.smarthalo;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.view.View;
+import android.os.IBinder;
+import android.util.Log;
 
-import androidx.core.view.WindowCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import bike.smarthalo.app.services.SHCentralService;
+import bike.smarthalo.app.services.ServiceBinders.SHCentralServiceBinder;
 import bike.smarthalo.databinding.ActivityMainBinding;
 import bike.smarthalo.sdk.RequestPermissionsActivity;
-import bike.smarthalo.sdk.SHDeviceServiceStartHelper;
+import bike.smarthalo.sdk.SHDeviceService;
+import bike.smarthalo.sdk.SHDeviceServiceBinder;
 
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static String TAG = MainActivity.class.getSimpleName();
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+
+    private SHCentralService centralService;
+    private SHDeviceServiceBinder deviceBinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +48,72 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*SHDeviceServiceStartHelper.requestLogout(Application.getAppContext());
-                boolean isTester = false;
-                SHDeviceServiceStartHelper.requestLogin(Application.getAppContext(), "password", "deviceId", isTester);*/
-
-                Intent myIntent = new Intent(Application.getAppContext(), RequestPermissionsActivity.class);
-                startActivity(myIntent);
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAnchorView(R.id.fab)
-                        .setAction("Action", null).show();*/
-
+        binding.showIntro.setOnClickListener(view -> {
+            if (centralService == null || deviceBinder == null) {
+                return;
             }
+            deviceBinder.ui_logo(null);
         });
+
+        binding.fab.setOnClickListener(view -> {
+            /*SHDeviceServiceStartHelper.requestLogout(Application.getAppContext());
+            boolean isTester = false;
+            SHDeviceServiceStartHelper.requestLogin(Application.getAppContext(), "password", "deviceId", isTester);*/
+
+            Intent myIntent = new Intent(Application.getAppContext(), RequestPermissionsActivity.class);
+            startActivity(myIntent);
+            /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                    .setAnchorView(R.id.fab)
+                    .setAction("Action", null).show();*/
+
+        });
+    }
+
+    private ServiceConnection centralServiceConnection = new ServiceConnection() { // from class: bike.smarthalo.app.activities.ScanResultsActivity.3
+        @Override // android.content.ServiceConnection
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.i(MainActivity.TAG, "centralServiceConnection onServiceConnected");
+            SHCentralServiceBinder binder = (SHCentralServiceBinder) iBinder;
+            centralService = binder.getService();
+        }
+
+        @Override // android.content.ServiceConnection
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.i(MainActivity.TAG, "centralServiceConnection onServiceDisconnected");
+            centralService = null;
+        }
+    };
+
+    private ServiceConnection deviceServiceConnection = new ServiceConnection() { // from class: bike.smarthalo.app.activities.ScanResultsActivity.3
+        @Override // android.content.ServiceConnection
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.i(MainActivity.TAG, "deviceServiceConnection onServiceConnected");
+            deviceBinder = (SHDeviceServiceBinder) iBinder;
+        }
+
+        @Override // android.content.ServiceConnection
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.i(MainActivity.TAG, "deviceServiceConnection onServiceDisconnected");
+            deviceBinder = null;
+        }
+    };
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent centralServiceIntent = new Intent(this, SHCentralService.class);
+        bindService(centralServiceIntent, centralServiceConnection, Context.BIND_AUTO_CREATE);
+
+        Intent shDeviceServiceIntent = new Intent(this, SHDeviceService.class);
+        bindService(shDeviceServiceIntent, deviceServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(centralServiceConnection);
+        unbindService(deviceServiceConnection);
     }
 
     @Override

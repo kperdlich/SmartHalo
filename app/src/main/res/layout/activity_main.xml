@@ -30,4 +30,10 @@
         android:layout_marginBottom="16dp"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
+    <Button
+        android:id="@+id/show_intro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Intro" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

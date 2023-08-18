@@ -60,6 +60,8 @@
         <service
             android:name=".sdk.SHDeviceService"
             android:label="SHDeviceService" />
+        <service android:name="bike.smarthalo.app.services.SHCentralService" android:exported="false"/>
+
     </application>
 
 </manifest>
