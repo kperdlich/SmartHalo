@@ -40,9 +40,6 @@
         android:theme="@style/Theme.Smarthalo"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity2"
-            android:exported="false" />
-        <activity
             android:name=".sdk.RequestPermissionsActivity"
             android:exported="false" />
         <activity

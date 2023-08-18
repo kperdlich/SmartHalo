@@ -42,20 +42,28 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.toolbar);
+        binding.buttonShowLogo.setEnabled(false);
+        binding.buttonDisconnect.setEnabled(false);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-        binding.showIntro.setOnClickListener(view -> {
+        binding.buttonShowLogo.setOnClickListener(view -> {
             if (centralService == null || deviceBinder == null) {
                 return;
             }
             deviceBinder.ui_logo(null);
         });
 
-        binding.fab.setOnClickListener(view -> {
+        binding.buttonDisconnect.setOnClickListener(view -> {
+            if (centralService == null || deviceBinder == null) {
+                return;
+            }
+            deviceBinder.forgetSavedDeviceAndDisconnect();
+
+            binding.buttonShowLogo.setEnabled(false);
+            binding.buttonDisconnect.setEnabled(false);
+            binding.buttonConnect.setEnabled(true);
+        });
+
+        binding.buttonConnect.setOnClickListener(view -> {
             /*SHDeviceServiceStartHelper.requestLogout(Application.getAppContext());
             boolean isTester = false;
             SHDeviceServiceStartHelper.requestLogin(Application.getAppContext(), "password", "deviceId", isTester);*/
@@ -65,7 +73,9 @@ public class MainActivity extends AppCompatActivity {
             /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAnchorView(R.id.fab)
                     .setAction("Action", null).show();*/
-
+            binding.buttonShowLogo.setEnabled(true);
+            binding.buttonDisconnect.setEnabled(true);
+            binding.buttonConnect.setEnabled(false);
         });
     }
 
