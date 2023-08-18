@@ -50,7 +50,7 @@ public class ServiceStorageController implements CurrentDeviceContract {
     this.name = "SmartHalo";
     this.address = "";
     this.id = "";
-    this.password = "";
+    this.password = "YKd57tOAWOkWjxMIZUX6xyFMOWvr5pdK";
     this.deviceVersion = "";
     this.isTester = false;
   }
