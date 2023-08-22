@@ -1,44 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<!-- Layout for the main screen -->
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listview_dessert"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="414dp"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/ic_launcher_foreground" />
-
-        <Button
-            android:id="@+id/buttonConnect"
-            android:layout_width="match_parent"
-            android:layout_height="74dp"
-            android:layout_weight="1"
-            android:text="Connect to Device" />
-
-        <Button
-            android:id="@+id/buttonShowLogo"
-            android:layout_width="match_parent"
-            android:layout_height="68dp"
-            android:layout_weight="1"
-            android:text="Show Logo" />
-
-        <Button
-            android:id="@+id/buttonDisconnect"
-            android:layout_width="match_parent"
-            android:layout_height="68dp"
-            android:layout_weight="1"
-            android:text="Disconnect" />
-
-    </LinearLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin" />

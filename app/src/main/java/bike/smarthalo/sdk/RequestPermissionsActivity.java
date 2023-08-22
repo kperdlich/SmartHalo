@@ -9,7 +9,6 @@ public class RequestPermissionsActivity extends AppCompatActivity {
   protected void onCreate(Bundle paramBundle) {
     super.onCreate(paramBundle);
     //setContentView(R.layout.activity_dialog);
-    setContentView(bike.smarthalo.R.layout.activity_main2);
 
     if (!SHSdkHelpers.checkPermissions((Context)this, SHSdkHelpers.getBlePermissions())) {
       SHSdkHelpers.requestPermissions(this, SHSdkHelpers.getBlePermissions(), 100, R.string.app_name);

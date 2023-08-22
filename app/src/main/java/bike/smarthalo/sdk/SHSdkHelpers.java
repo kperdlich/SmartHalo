@@ -169,6 +169,10 @@ public class SHSdkHelpers {
       ActivityCompat.requestPermissions(activity, permissions, PermissionRequest);
     } 
   }
+
+  public static void startScanning(final Activity activity) {
+    SHDeviceServiceStartHelper.requestStartScanning((Context)activity);
+  }
   
   public static void startScanningAndFinishActivity(final Activity activity) {
     SHDeviceServiceStartHelper.requestStartScanning((Context)activity);
