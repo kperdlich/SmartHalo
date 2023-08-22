@@ -1,5 +1,6 @@
 package bike.smarthalo;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,7 +15,6 @@ import android.util.Log;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import bike.smarthalo.app.services.SHCentralService;
@@ -35,17 +35,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     private static String TAG = MainActivity.class.getSimpleName();
-    private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-
     private ListView deviceList;
     private BleDeviceAdapter flavorAdapter;
     private SHCentralService centralService;
     private SHDeviceServiceBinder deviceBinder;
 
-    private final BroadcastReceiver deviceServiceUpdateReceiver = new BroadcastReceiver() { // from class: bike.smarthalo.app.activities.ScanResultsActivity.1
+    private final BroadcastReceiver deviceServiceUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null) {
@@ -61,10 +58,16 @@ public class MainActivity extends AppCompatActivity {
             } else if (SHDeviceServiceIntents.BROADCAST_DEVICE_LIST_UPDATED.equals(action)) {
                 updateDeviceList();
             } else if (SHDeviceServiceIntents.BROADCAST_CONNECTED_STOPPING_SCAN.equals(action)) {
-                //SHDeviceServiceStartHelper.requestStartScanning(ScanResultsActivity.this);
             }
         }
     };
+
+    private void showProgressBarForDeviceConnection(BleDevice device) {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Connecting to device ..");
+        progressDialog.setMessage(device.name + " " + device.address);
+        progressDialog.show();
+    }
 
     private void updateDeviceList() {
         flavorAdapter.replaceDeviceList(deviceBinder.getDeviceList());
@@ -83,14 +86,16 @@ public class MainActivity extends AppCompatActivity {
         deviceList.setAdapter(flavorAdapter);
         deviceList.setOnItemClickListener((adapterView, view, i, l) -> {
             final BleDevice device = deviceBinder.getDeviceList().get(i);
-            if (!deviceBinder
+            if (deviceBinder
                     .setMyDevice(device.address, device.id)
                     .connect()) {
+                showProgressBarForDeviceConnection(device);
+            } else {
                 Toast.makeText(this, "Connection error", Toast.LENGTH_LONG).show();
             }
         });
 
-        if (!SHSdkHelpers.checkPermissions((Context)this, SHSdkHelpers.getBlePermissions())) {
+        if (!SHSdkHelpers.checkPermissions((Context) this, SHSdkHelpers.getBlePermissions())) {
             SHSdkHelpers.requestPermissions(this, SHSdkHelpers.getBlePermissions(), 100, bike.smarthalo.sdk.R.string.app_name);
         } else {
             SHSdkHelpers.startScanning(this);
