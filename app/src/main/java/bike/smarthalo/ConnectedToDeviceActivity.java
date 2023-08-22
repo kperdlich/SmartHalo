@@ -15,13 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import bike.smarthalo.sdk.SHDeviceService;
 import bike.smarthalo.sdk.SHDeviceServiceBinder;
 import bike.smarthalo.sdk.SHDeviceServiceIntents;
-import bike.smarthalo.sdk.models.BleDevice;
 import bike.smarthalo.sdk.models.DeviceConnectionState;
 
 public class ConnectedToDeviceActivity extends AppCompatActivity {
 
     private SHDeviceServiceBinder deviceBinder;
-
 
     private final BroadcastReceiver deviceServiceUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -72,6 +70,12 @@ public class ConnectedToDeviceActivity extends AppCompatActivity {
 
         Button showLogoButton = (Button) findViewById(R.id.show_logo_button);
         showLogoButton.setOnClickListener(v -> deviceBinder.ui_logo(null));
+
+        Button speedometerIntroButton = (Button) findViewById(R.id.speedometer_intro_button);
+        speedometerIntroButton.setOnClickListener(v -> deviceBinder.ui_speedometer_intro(null));
+
+        Button chargeStateButton = (Button) findViewById(R.id.charge_state_button);
+        chargeStateButton.setOnClickListener(v -> deviceBinder.showChargeState(null));
 
         registerReceiver(deviceServiceUpdateReceiver, SHDeviceService.getDeviceServiceUpdateIntentFilter());
     }

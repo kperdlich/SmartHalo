@@ -15,6 +15,7 @@ import android.util.Log;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import bike.smarthalo.app.services.SHCentralService;
@@ -35,14 +36,16 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
     private static String TAG = MainActivity.class.getSimpleName();
+    private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private ListView deviceList;
     private BleDeviceAdapter flavorAdapter;
     private SHCentralService centralService;
     private SHDeviceServiceBinder deviceBinder;
 
-    private final BroadcastReceiver deviceServiceUpdateReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver deviceServiceUpdateReceiver = new BroadcastReceiver() { // from class: bike.smarthalo.app.activities.ScanResultsActivity.1
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null) {

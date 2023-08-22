@@ -32,7 +32,21 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Show Logo" />
+            android:text="Logo" />
+
+        <Button
+            android:id="@+id/speedometer_intro_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Speedometer Intro" />
+
+        <Button
+            android:id="@+id/charge_state_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Charge State" />
     </LinearLayout>
 
 </LinearLayout>
