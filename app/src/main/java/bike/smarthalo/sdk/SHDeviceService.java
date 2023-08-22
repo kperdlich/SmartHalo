@@ -1201,15 +1201,6 @@ public class SHDeviceService extends Service implements TransceiveContract, Devi
   /* JADX INFO: Access modifiers changed from: private */
   public void broadcastDeviceListUpdated() {
     sendBroadcast(new Intent(SHDeviceServiceIntents.BROADCAST_DEVICE_LIST_UPDATED));
-
-    // custom code
-    //BluetoothDevice bluetoothDevice = getBluetoothDevice(this.serviceStorageController.address);
-    BluetoothDevice bluetoothDevice = getBluetoothDevice(this.mDeviceList.get(0).address);
-    if (bluetoothDevice != null) {
-      stopPendingIntentScan();
-      startDirectConnectionTimeout();
-      this.bluetoothDataManager.setUpDeviceConnection(bluetoothDevice);
-    }
   }
 
   @Override // bike.smarthalo.sdk.encryption.EncryptionContract

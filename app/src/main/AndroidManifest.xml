@@ -43,13 +43,15 @@
             android:name=".sdk.RequestPermissionsActivity"
             android:exported="false" />
         <activity
+            android:name=".ConnectedToDeviceActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Smarthalo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

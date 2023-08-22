@@ -166,7 +166,11 @@ public class CommandsConstants {
   public static final byte[] cmd_touch_sounds;
   
   public static final byte[] cmd_turn_by_turn_intro;
-  
+
+  public static final byte[] cmd_tst_auth_cmd_getSeed;
+
+  public static final byte[] tst_auth_cmd_enterFactory;
+
   public static final byte ret_denied = 2;
   
   public static final byte ret_fail = 1;
@@ -244,5 +248,7 @@ public class CommandsConstants {
     cmd_experimental_oled_brightness = new byte[] { -8, 24 };
     cmd_experimental_touch_calibration = new byte[] { -8, 25 };
     cmd_experimental_swipe_calibration = new byte[] { -8, 26 };
+    cmd_tst_auth_cmd_getSeed = new byte[] { 0xF, 0 };
+    tst_auth_cmd_enterFactory = new byte[] { 0xF, 1 };
   }
 }
