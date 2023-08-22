@@ -1,5 +1,6 @@
 package bike.smarthalo;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import bike.smarthalo.sdk.SHDeviceService;
 import bike.smarthalo.sdk.SHDeviceServiceBinder;
 import bike.smarthalo.sdk.SHDeviceServiceIntents;
+import bike.smarthalo.sdk.models.BleDevice;
 import bike.smarthalo.sdk.models.DeviceConnectionState;
 
 public class ConnectedToDeviceActivity extends AppCompatActivity {
@@ -39,6 +41,12 @@ public class ConnectedToDeviceActivity extends AppCompatActivity {
         }
     };
 
+    private void showProgressBarForDisconnecting() {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Disconnecting from device ..");
+        progressDialog.show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -57,7 +65,10 @@ public class ConnectedToDeviceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_connected_to_device);
 
         Button disconnectButton = (Button) findViewById(R.id.disconnect_button);
-        disconnectButton.setOnClickListener(v -> deviceBinder.forgetSavedDeviceAndDisconnect());
+        disconnectButton.setOnClickListener(v -> {
+            showProgressBarForDisconnecting();
+            deviceBinder.forgetSavedDeviceAndDisconnect();
+        });
 
         Button showLogoButton = (Button) findViewById(R.id.show_logo_button);
         showLogoButton.setOnClickListener(v -> deviceBinder.ui_logo(null));
