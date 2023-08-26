@@ -61,7 +61,11 @@ public class SHDeviceServiceBinder extends Binder {
   public void configureAlarmSeverity(byte[] paramArrayOfbyte, int paramInt1, int paramInt2, boolean paramBoolean1, boolean paramBoolean2, CmdCallback paramCmdCallback) {
     this.service.getAlarmCommandsController().configureAlarm(paramArrayOfbyte, paramInt1, paramInt2, paramBoolean1, paramBoolean2, true, paramCmdCallback);
   }
-  
+
+  public void startTimingAttack(String str, final CmdCallback cmdCallback) {
+    this.service.startTimingAttack(str, cmdCallback);
+  }
+
   public boolean connect() {
     return this.service.manualConnect();
   }

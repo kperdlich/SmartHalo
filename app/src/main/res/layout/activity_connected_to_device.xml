@@ -47,6 +47,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Charge State" />
+
+        <Button
+            android:id="@+id/launch_timing_attack"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="launch_timing_attack" />
+
     </LinearLayout>
 
 </LinearLayout>

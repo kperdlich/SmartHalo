@@ -693,6 +693,32 @@ public class SHDeviceService extends Service implements TransceiveContract, Devi
     cleanUpDeviceConnection();
   }
 
+  public void startTimingAttack(String str, final CmdCallback cmdCallback) {
+    try {
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      byteArrayOutputStream.write(CommandsConstants.cmd_authenticate);
+      byteArrayOutputStream.write(str.getBytes());
+      transceive(byteArrayOutputStream.toByteArray(), true, "sendAuthenticationCommand", false, true, new TransceiveCallback() { // from class: bike.smarthalo.sdk.SHDeviceService.3
+        @Override // bike.smarthalo.sdk.models.TransceiveCallback
+        public void onData(byte[] bArr) {
+          if (bArr[0] == 0) {
+            cmdCallback.onSuccess();
+          } else {
+            cmdCallback.onErr(bArr[0]);
+          }
+        }
+
+        @Override // bike.smarthalo.sdk.models.TransceiveCallback
+        public void onFail(String str2) {
+          cmdCallback.onFail(str2);
+        }
+      });
+    } catch (IOException e) {
+      cmdCallback.onFail(e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
   private void sendAuthenticationCommand(String str, final CmdCallback cmdCallback) {
     try {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
