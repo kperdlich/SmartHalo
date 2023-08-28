@@ -13,11 +13,14 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.LongStream;
+
 import bike.smarthalo.sdk.CmdCallback;
 import bike.smarthalo.sdk.SHDeviceService;
 import bike.smarthalo.sdk.SHDeviceServiceBinder;
@@ -66,6 +69,22 @@ public class ConnectedToDeviceActivity extends AppCompatActivity {
 
     private boolean callbackReceived = false;
     private long startTime;
+
+    public class TimingAttackCharResult {
+        public double stdDeviation;
+        public double average;
+        public long min;
+        public long max;
+        @Override
+        public String toString() {
+            return "TimingAttackCharResult{" +
+                    "stdDeviation=" + stdDeviation +
+                    ", average=" + average +
+                    ", min=" + min +
+                    ", max=" + max +
+                    '}';
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,14 +151,14 @@ public class ConnectedToDeviceActivity extends AppCompatActivity {
 
             List<Long> responseTimes = new ArrayList<>();
 
-            Map<Character, Double> charStdDevMap = new HashMap<>();
+            Map<Character, TimingAttackCharResult> charStdDevMap = new HashMap<>();
 
             for (int i = 0; i < alphabet.length(); i++) {
                 responseTimes.clear();
 
                 char currentChar = alphabet.charAt(i);
 
-                for (int j = 0; j < 1000; j++) {
+                for (int j = 0; j < 10; j++) {
 
                     callbackReceived = false;
                     startTime = System.nanoTime();
@@ -176,27 +195,89 @@ public class ConnectedToDeviceActivity extends AppCompatActivity {
                 }
 
                 double errorStdDev = calculateStandardDeviation(responseTimes);
-
-                charStdDevMap.put(currentChar, errorStdDev);
+                final TimingAttackCharResult result = new TimingAttackCharResult();
+                result.stdDeviation = errorStdDev;
+                result.min = responseTimes.stream().mapToLong(Long::longValue).min().orElse(-1);
+                result.max = responseTimes.stream().mapToLong(Long::longValue).max().orElse(-1);
+                result.average = responseTimes.stream().mapToLong(Long::longValue).average().orElse(-1);
+                charStdDevMap.put(currentChar, result);
             }
 
-            Map<Character, Double> sortedMap = sortByValue(charStdDevMap);
+            Map<Character, TimingAttackCharResult> sortByStdDeviation = sortByStdDeviation(charStdDevMap);
+            Map<Character, TimingAttackCharResult> sortByStdAverage = sortByAverage(charStdDevMap);
+            Map<Character, TimingAttackCharResult> sortByStdMin = sortByMin(charStdDevMap);
+            Map<Character, TimingAttackCharResult> sortByStdMax = sortByMax(charStdDevMap);
 
-            for (Map.Entry<Character, Double> entry : sortedMap.entrySet()) {
-                System.out.println("Character: " + entry.getKey() + ", Std Deviation: " + entry.getValue());
+            System.out.println("sortByStdDeviation");
+            for (Map.Entry<Character, TimingAttackCharResult> entry : sortByStdDeviation.entrySet()) {
+                System.out.println("Character: " + entry.getKey() + ", " + entry.getValue());
+            }
+
+            System.out.println("sortByStdAverage");
+            for (Map.Entry<Character, TimingAttackCharResult> entry : sortByStdAverage.entrySet()) {
+                System.out.println("Character: " + entry.getKey() + ", " + entry.getValue());
+            }
+
+            System.out.println("sortByStdMin");
+            for (Map.Entry<Character, TimingAttackCharResult> entry : sortByStdMin.entrySet()) {
+                System.out.println("Character: " + entry.getKey() + ", " + entry.getValue());
+            }
+
+            System.out.println("sortByStdMax");
+            for (Map.Entry<Character, TimingAttackCharResult> entry : sortByStdMax.entrySet()) {
+                System.out.println("Character: " + entry.getKey() + ", " + entry.getValue());
             }
         });
 
         registerReceiver(deviceServiceUpdateReceiver, SHDeviceService.getDeviceServiceUpdateIntentFilter());
     }
 
-    public static Map<Character, Double> sortByValue(Map<Character, Double> unsortedMap) {
-        List<Map.Entry<Character, Double>> list = new LinkedList<>(unsortedMap.entrySet());
+    public static Map<Character, TimingAttackCharResult> sortByStdDeviation(Map<Character, TimingAttackCharResult> unsortedMap) {
+        List<Map.Entry<Character, TimingAttackCharResult>> list = new LinkedList<>(unsortedMap.entrySet());
 
-        list.sort(Map.Entry.comparingByValue());
+        list.sort(Comparator.comparingDouble(o -> o.getValue().stdDeviation));
 
-        Map<Character, Double> sortedMap = new LinkedHashMap<>();
-        for (Map.Entry<Character, Double> entry : list) {
+        Map<Character, TimingAttackCharResult> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Character, TimingAttackCharResult> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
+
+    public static Map<Character, TimingAttackCharResult> sortByAverage(Map<Character, TimingAttackCharResult> unsortedMap) {
+        List<Map.Entry<Character, TimingAttackCharResult>> list = new LinkedList<>(unsortedMap.entrySet());
+
+        list.sort(Comparator.comparingDouble(o -> o.getValue().average));
+
+        Map<Character, TimingAttackCharResult> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Character, TimingAttackCharResult> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
+
+    public static Map<Character, TimingAttackCharResult> sortByMin(Map<Character, TimingAttackCharResult> unsortedMap) {
+        List<Map.Entry<Character, TimingAttackCharResult>> list = new LinkedList<>(unsortedMap.entrySet());
+
+        list.sort(Comparator.comparingLong(o -> o.getValue().min));
+
+        Map<Character, TimingAttackCharResult> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Character, TimingAttackCharResult> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
+
+    public static Map<Character, TimingAttackCharResult> sortByMax(Map<Character, TimingAttackCharResult> unsortedMap) {
+        List<Map.Entry<Character, TimingAttackCharResult>> list = new LinkedList<>(unsortedMap.entrySet());
+
+        list.sort(Comparator.comparingLong(o -> o.getValue().max));
+
+        Map<Character, TimingAttackCharResult> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Character, TimingAttackCharResult> entry : list) {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
 
