@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         bleDeviceAdapter = new BleDeviceAdapter(this, new ArrayList<>());
 
-        deviceList = findViewById(R.id.listview_dessert);
+        deviceList = findViewById(R.id.listview_devices);
         deviceList.setAdapter(bleDeviceAdapter);
         deviceList.setOnItemClickListener((adapterView, view, i, l) -> {
             final BleDevice device = deviceBinder.getDeviceList().get(i);
