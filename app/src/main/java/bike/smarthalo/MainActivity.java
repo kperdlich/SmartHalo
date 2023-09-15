@@ -18,8 +18,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import bike.smarthalo.app.services.SHCentralService;
-import bike.smarthalo.app.services.ServiceBinders.SHCentralServiceBinder;
 import bike.smarthalo.databinding.ActivityMainBinding;
 import bike.smarthalo.sdk.SHDeviceService;
 import bike.smarthalo.sdk.SHDeviceServiceBinder;
@@ -36,14 +34,26 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     private static String TAG = MainActivity.class.getSimpleName();
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private ListView deviceList;
-    private BleDeviceAdapter flavorAdapter;
-    private SHCentralService centralService;
+    private BleDeviceAdapter bleDeviceAdapter;
     private SHDeviceServiceBinder deviceBinder;
+
+    private ServiceConnection deviceServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.i(MainActivity.TAG, "deviceServiceConnection onServiceConnected");
+            deviceBinder = (SHDeviceServiceBinder) iBinder;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.i(MainActivity.TAG, "deviceServiceConnection onServiceDisconnected");
+            deviceBinder = null;
+        }
+    };
 
     private final BroadcastReceiver deviceServiceUpdateReceiver = new BroadcastReceiver() { // from class: bike.smarthalo.app.activities.ScanResultsActivity.1
         @Override
@@ -51,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             if (intent == null) {
                 return;
             }
+
             String action = intent.getAction();
             if (SHDeviceServiceIntents.BROADCAST_ERROR.equals(action)) {
             } else if (SHDeviceServiceIntents.BROADCAST_CONNECTION_STATE.equals(action)) {
@@ -73,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDeviceList() {
-        flavorAdapter.replaceDeviceList(deviceBinder.getDeviceList());
+        bleDeviceAdapter.replaceDeviceList(deviceBinder.getDeviceList());
     }
 
     @Override
@@ -83,10 +94,10 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        flavorAdapter = new BleDeviceAdapter(this, new ArrayList<>());
+        bleDeviceAdapter = new BleDeviceAdapter(this, new ArrayList<>());
 
-        deviceList = (ListView) findViewById(R.id.listview_dessert);
-        deviceList.setAdapter(flavorAdapter);
+        deviceList = findViewById(R.id.listview_dessert);
+        deviceList.setAdapter(bleDeviceAdapter);
         deviceList.setOnItemClickListener((adapterView, view, i, l) -> {
             final BleDevice device = deviceBinder.getDeviceList().get(i);
             if (deviceBinder
@@ -98,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (!SHSdkHelpers.checkPermissions((Context) this, SHSdkHelpers.getBlePermissions())) {
+        if (!SHSdkHelpers.checkPermissions(this, SHSdkHelpers.getBlePermissions())) {
             SHSdkHelpers.requestPermissions(this, SHSdkHelpers.getBlePermissions(), 100, bike.smarthalo.sdk.R.string.app_name);
         } else {
             SHSdkHelpers.startScanning(this);
@@ -122,49 +133,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int paramInt, String[] paramArrayOfString, int[] paramArrayOfint) {
         super.onRequestPermissionsResult(paramInt, paramArrayOfString, paramArrayOfint);
-        if (paramInt == 100)
+        if (paramInt == 100) {
             if (paramArrayOfint.length > 0 && paramArrayOfint[0] == 0) {
                 SHSdkHelpers.startScanning(this);
             } else {
                 SHSdkHelpers.startScanning(this);
             }
+        }
     }
-
-    private ServiceConnection centralServiceConnection = new ServiceConnection() { // from class: bike.smarthalo.app.activities.ScanResultsActivity.3
-        @Override // android.content.ServiceConnection
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.i(MainActivity.TAG, "centralServiceConnection onServiceConnected");
-            SHCentralServiceBinder binder = (SHCentralServiceBinder) iBinder;
-            centralService = binder.getService();
-        }
-
-        @Override // android.content.ServiceConnection
-        public void onServiceDisconnected(ComponentName componentName) {
-            Log.i(MainActivity.TAG, "centralServiceConnection onServiceDisconnected");
-            centralService = null;
-        }
-    };
-
-    private ServiceConnection deviceServiceConnection = new ServiceConnection() { // from class: bike.smarthalo.app.activities.ScanResultsActivity.3
-        @Override // android.content.ServiceConnection
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.i(MainActivity.TAG, "deviceServiceConnection onServiceConnected");
-            deviceBinder = (SHDeviceServiceBinder) iBinder;
-        }
-
-        @Override // android.content.ServiceConnection
-        public void onServiceDisconnected(ComponentName componentName) {
-            Log.i(MainActivity.TAG, "deviceServiceConnection onServiceDisconnected");
-            deviceBinder = null;
-        }
-    };
-
 
     @Override
     protected void onStart() {
         super.onStart();
-        Intent centralServiceIntent = new Intent(this, SHCentralService.class);
-        bindService(centralServiceIntent, centralServiceConnection, Context.BIND_AUTO_CREATE);
 
         Intent shDeviceServiceIntent = new Intent(this, SHDeviceService.class);
         bindService(shDeviceServiceIntent, deviceServiceConnection, Context.BIND_AUTO_CREATE);

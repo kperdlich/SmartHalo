@@ -13,9 +13,6 @@ import java.util.List;
 import bike.smarthalo.sdk.models.BleDevice;
 
 public class BleDeviceAdapter extends ArrayAdapter<BleDevice> {
-
-    private static final String LOG_TAG = BleDeviceAdapter.class.getSimpleName();
-
     public BleDeviceAdapter(Activity context, ArrayList<BleDevice> devices) {
         super(context, 0, devices);
     }
@@ -36,10 +33,10 @@ public class BleDeviceAdapter extends ArrayAdapter<BleDevice> {
 
         BleDevice device = getItem(position);
 
-        TextView nameTextView = (TextView) listItemView.findViewById(R.id.name);
+        TextView nameTextView = listItemView.findViewById(R.id.name);
         nameTextView.setText(device.name);
 
-        TextView numberTextView = (TextView) listItemView.findViewById(R.id.address);
+        TextView numberTextView = listItemView.findViewById(R.id.address);
         numberTextView.setText(String.valueOf(device.address));
 
         return listItemView;
